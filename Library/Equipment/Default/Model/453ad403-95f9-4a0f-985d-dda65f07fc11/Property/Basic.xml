@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="GBK" ?> 
+
+<Equipment name = "aa">
+	<Name Tag="Name" Type="Var" Desc="名称" ValueType="string">木质堵漏楔</Name>
+	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">100</Weight>
+</Equipment>

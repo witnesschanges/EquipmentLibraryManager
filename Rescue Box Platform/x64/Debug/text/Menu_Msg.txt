@@ -1,0 +1,34 @@
+Menu
+Rescue Equipments Car
+救援器材车
+#
+
+InsertEquipment
+Insert Equipment
+插入器材
+#
+
+InsertEquipmentHelp
+Insert Equipment Help
+插入器材
+#
+
+InsertMechanism
+InsertMechanism
+插入机构
+#
+
+InsertMechanismHelp
+Insert Mechanism Help
+插入机构
+#
+
+EditMechanism
+EditMechanism
+编辑机构
+#
+
+EditMechanismHelp
+Edit Mechanism Help
+编辑机构
+#

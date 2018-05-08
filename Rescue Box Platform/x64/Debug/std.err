@@ -1,0 +1,5 @@
+ERROR: version check failed: clnt_call status 4
+	local ver 1228399088 
+	pro_comm_msg ver 3 -> 3
+ERROR  : pro_comm_msg at 1073822385 2 not started. 
+ERROR: could not initialize commn layer 

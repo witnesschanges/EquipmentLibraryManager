@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CAboutDlg" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAhBAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Equipment Library ManagerDlg.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AccessOperation" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>AccessOperation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEquipmentLibraryManagerApp" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAgBAAAABAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Equipment Library Manager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEquipmentLibraryManagerDlg" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAGAABFAAAQQoAUMAhBAAAAQBAAAEAQAAAAAFAAQAAA=</HashCode>
+      <FileName>Equipment Library ManagerDlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XMLProc" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>XMLProc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

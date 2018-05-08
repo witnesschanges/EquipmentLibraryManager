@@ -1,0 +1,7 @@
+NAME Rescue Box Platform
+STARTUP dll
+EXEC_FILE .\Rescue Box Platform.dll
+TEXT_DIR .\
+ALLOW_STOP TRUE
+REVISION 2009
+END

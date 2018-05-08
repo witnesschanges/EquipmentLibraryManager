@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="GBK" ?> 
+
+<Equipment name = "aa">
+	<Name Tag="Name" Type="Var" Desc="名称" ValueType="string">液压剪切器</Name>
+	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">450</Weight>
+</Equipment>

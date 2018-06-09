@@ -12,10 +12,9 @@
 #define IDD_EQUIPMENTINSERT             137
 #define IDD_EQUIPMENTDELETE             138
 #define IDD_EQUIPMENTREFRESH            139
-#define IDI_WEB_ICON                    140
-#define IDI_THIRDNODE_ICON              140
+#define IDI_FIRSTNODE_ICON              140
 #define IDI_SECONDNODE_ICON             141
-#define IDI_FIRSTNODE_ICON              142
+#define IDI_THIRDNODE_ICON              142
 #define IDC_TREE1                       1000
 #define IDC_TREE_LIB                    1000
 #define IDC_LIST1                       1001
@@ -44,6 +43,13 @@
 #define IDC_SortOrder                   1034
 #define IDC_OldEquipmentNameEDIT        1036
 #define IDC_NewEquipmentNameEDIT        1037
+#define IDC_DELETPATHEDIT               1038
+#define IDC_DELEDTPATH                  1039
+#define IDC_REVISEPROPERTY              1040
+#define IDC_ADDBUTTON                   1042
+#define IDC_ADDPROPERTY                 1042
+#define IDC_INSERTCATAGORY              1043
+#define IDC_DELETECATAGORY              1045
 
 // Next default values for new objects
 // 
@@ -51,7 +57,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_CONTROL_VALUE         1046
 #define _APS_NEXT_SYMED_VALUE           120
 #endif
 #endif

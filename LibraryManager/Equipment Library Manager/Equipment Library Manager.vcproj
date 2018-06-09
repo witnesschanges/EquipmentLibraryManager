@@ -410,6 +410,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="全局变量声明"
+				>
+				<File
+					RelativePath=".\global.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="头文件"
@@ -461,6 +469,14 @@
 				</File>
 				<File
 					RelativePath=".\XMLProc.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="全局变量定义"
+				>
+				<File
+					RelativePath=".\global.h"
 					>
 				</File>
 			</Filter>

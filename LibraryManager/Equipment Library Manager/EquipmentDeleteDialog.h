@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CEquipmentDeleteDialog ¶Ô»°¿ò
@@ -21,4 +22,5 @@ protected:
 public:
 	CString m_EquipmentName;
 	afx_msg void OnBnClickedOk();
+	CString m_DeletePath;
 };

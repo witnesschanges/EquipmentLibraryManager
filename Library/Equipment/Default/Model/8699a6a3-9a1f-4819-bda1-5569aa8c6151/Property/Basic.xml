@@ -2,5 +2,5 @@
 
 <Equipment name = "aa">
 	<Name Tag="Name" Type="Var" Desc="名称" ValueType="string">手持扩音器</Name>
-	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">200</Weight>
+	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">210</Weight>
 </Equipment>

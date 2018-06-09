@@ -9,6 +9,7 @@
 #include "EquipmentInsertDialog.h"
 #include "EquipmentDeleteDialog.h"
 #include "EquipmentRefreshDialog.h"
+#include "global.h"
  
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,10 +76,13 @@ BEGIN_MESSAGE_MAP(CEquipmentLibraryManagerDlg, CDialog)
 	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE_LIB, &CEquipmentLibraryManagerDlg::OnTvnSelchangedTreeLib)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_EQUIPMENT, &CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment)
 	ON_NOTIFY(TVN_ITEMEXPANDING, IDC_TREE_LIB, &CEquipmentLibraryManagerDlg::OnTvnItemexpandingTreeLib)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_PROP, &CEquipmentLibraryManagerDlg::OnLvnItemchangedListProp)
+	//ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_PROP, &CEquipmentLibraryManagerDlg::OnLvnItemchangedListProp)
 	ON_BN_CLICKED(IDC_INSERTBUTTON, &CEquipmentLibraryManagerDlg::OnBnClickedInsertbutton)
 	ON_BN_CLICKED(IDC_REFRESHBUTTON, &CEquipmentLibraryManagerDlg::OnBnClickedRefreshbutton)
 	ON_BN_CLICKED(IDC_DELETEBUTTON, &CEquipmentLibraryManagerDlg::OnBnClickedDeletebutton)
+	ON_BN_CLICKED(IDC_REVISEPROPERTY, &CEquipmentLibraryManagerDlg::OnBnClickedReviseproperty)
+	ON_BN_CLICKED(IDC_INSERTCATAGORY, &CEquipmentLibraryManagerDlg::OnBnClickedInsertcatagory)
+	ON_BN_CLICKED(IDC_DELETECATAGORY, &CEquipmentLibraryManagerDlg::OnBnClickedDeletecatagory)
 END_MESSAGE_MAP()
 
 
@@ -89,7 +93,6 @@ BOOL CEquipmentLibraryManagerDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	// 将“关于...”菜单项添加到系统菜单中。
-
 	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -114,7 +117,6 @@ BOOL CEquipmentLibraryManagerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
 	//添加节点前的图标
 	HICON hIcon[3];      // 图标句柄数组  
     hIcon[0] = theApp.LoadIcon(IDI_FIRSTNODE_ICON);// 加载三个图标，并将它们的句柄保存到数组     
@@ -125,35 +127,8 @@ BOOL CEquipmentLibraryManagerDlg::OnInitDialog()
     {   
         m_imageList.Add(hIcon[i]);   
     }
-	m_treeCtrlLib.SetImageList(&m_imageList, TVSIL_NORMAL);// 为树形控件设置图像序列
-
-	// 初始化数据库连接
-	m_accessMag.OnInitADOConn();
-
-	// 填充TreeControl控件
-	HTREEITEM root = m_treeCtrlLib.InsertItem(_T("器材库"),2,2,TVI_ROOT,TVI_SORT);	
-	m_treeCtrlLib.SetItemData(root, 0);
-	
-	_RecordsetPtr res = m_accessMag.GetRecordSet("SELECT * FROM Menu WHERE ParentID = 0");	
-	while(!res->adoEOF)
-	{
-		CString name = (_bstr_t)res->GetFields()->GetItem("NodeName")->Value;
-		HTREEITEM node = m_treeCtrlLib.InsertItem(name, root, TVI_SORT);
-		m_treeCtrlLib.SetItemData(node, _ttoi((LPCTSTR)(_bstr_t)res->GetFields()->GetItem("NodeID")->Value));
-		res->MoveNext();
-	}
-	
-	m_treeCtrlLib.Expand(root,TVE_TOGGLE);  //树状结构第一层用程序展开
-	
-
-	// 填充器材属性控件
-	m_listCtrlProp.InsertColumn(0,_T("属性"),LVCFMT_LEFT,100,0);
-	m_listCtrlProp.InsertColumn(1,_T("值"),LVCFMT_LEFT,200,0);
-
-
-
-	//m_accessMag.ExitConnect();
-
+	//填充内容
+	CEquipmentLibraryManagerDlg::ContentFill();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -212,24 +187,8 @@ void CEquipmentLibraryManagerDlg::OnTvnSelchangedTreeLib(NMHDR *pNMHDR, LRESULT 
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码	
 
-	HTREEITEM node = m_treeCtrlLib.GetSelectedItem();
-	CString sql;
-    //_T()的作用是让你的程序支持Unicode（双字节方式）编码(lq)
-	sql.Format(_T("SELECT * FROM Equipment WHERE NodeID = %d"), m_treeCtrlLib.GetItemData(node));  //SQL语句
-	_RecordsetPtr res = m_accessMag.GetRecordSet((_bstr_t)sql);  //执行查询操作(lq)
-	
-	m_listEquipment.DeleteAllItems();
-	m_listCtrlProp.DeleteAllItems();
-
-	int i = 0;
-	while(!res->adoEOF)  //adoEOF实际就是EOF（END OF FILE），表示无更多资料可取(lq)
-	{
-		CString name = (_bstr_t)res->GetFields()->GetItem("EquipmentName")->Value;  //取得EquipmentName字段的值(lq)
-		m_listEquipment.InsertItem(i++,name);  //在列表控件里面插入一个新行
-		m_listEquipment.SetItemData(i-1,_ttoi((LPCTSTR)(_bstr_t)res->GetFields()->GetItem("ID")->Value));  //各项的序号和需要的内容相关联（lq）
-		res->MoveNext();  //进入下一条记录
-	}
-
+	//选择器材类别后刷新器材列表和器材属性
+	CEquipmentLibraryManagerDlg::RefreshList();
 	*pResult = 0;
 
 }
@@ -242,6 +201,17 @@ void CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment(NMHDR *pNMHDR, L
 	POSITION posi = m_listEquipment.GetFirstSelectedItemPosition();  //在列表视图控件中获取第一个选择的列表视图项的位置(lq)
 	if(posi != NULL)
 	{
+		//获取选中器材名文本并赋值给传递变量
+		CString SelEquipmentName;    // 选择语言的名称字符串   
+		NMLISTVIEW *pNMListView = (NMLISTVIEW*)pNMHDR;   
+		if (-1 != pNMListView->iItem)        // 如果iItem不是-1，就说明有列表项被选择   
+		{   
+			// 获取被选择列表项第一个子项的文本   
+			SelEquipmentName = m_listEquipment.GetItemText(pNMListView->iItem, 0);   
+			// 将获取的文本赋值给传递变量   
+			TransEquipmentName = SelEquipmentName;
+		}
+
 		int index = m_listEquipment.GetNextSelectedItem(posi);  //为重复而获取下一个选择的列表视图(lq)
 		int id = m_listEquipment.GetItemData(index);
 
@@ -250,8 +220,7 @@ void CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment(NMHDR *pNMHDR, L
 		_RecordsetPtr res = m_accessMag.GetRecordSet((_bstr_t)sql);
 
 		m_listCtrlProp.DeleteAllItems();
-		//CStatic* pStatic = (CStatic*)GetDlgItem(IDC_LIST_PIC);
-		//pStatic->SetBitmap(NULL);  （图片刷新的尝试）
+
 		int i = 0;
 		if(!res->adoEOF)
 		{
@@ -260,7 +229,7 @@ void CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment(NMHDR *pNMHDR, L
 			// 读取器材的属性
 			CString path;
 			path.Format(_T("%s\\Model\\%s\\Property\\Basic.xml"),m_libPath,name);
-			
+		
 			XMLProc xmlProc;
 			IXMLDOMDocumentPtr xmlDoc = xmlProc.Read((LPTSTR)(LPCTSTR)path);  //读取指定路径下的XML文件（lq）
 			IXMLDOMElement *rootEle = xmlProc.GetReadRoot();  //XML文档的根节点(lq)
@@ -273,7 +242,6 @@ void CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment(NMHDR *pNMHDR, L
 				BSTR attrName,attrValue;
 				xmlProc.GetNodeAttribute(temp,"Tag",&attrName);  //读取指定节点的属性（lq）
 				xmlProc.GetText(temp,&attrValue);  //获得节点值(lq)
-				
 				m_listCtrlProp.InsertItem(m_listCtrlProp.GetItemCount(),attrName);
 				m_listCtrlProp.SetItemText(m_listCtrlProp.GetItemCount()-1,1,attrValue);
 			}	
@@ -281,28 +249,18 @@ void CEquipmentLibraryManagerDlg::OnLvnItemchangedListEquipment(NMHDR *pNMHDR, L
 			// 读取预览图
 			CString picPath;
 			picPath.Format(_T("%s\\Model\\%s\\demo.bmp"),m_libPath,name);
-
-
-			//CStatic *pStatic=(CStatic *)GetDlgItem(IDC_LIST_PIC);  
-			//HBITMAP hBitmap=::LoadBitmap(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDC_LIST_PIC5 (Picture Control)));  
-			///*设置静态控件的样式，使其可以使用位图，并试位标显示使居中  */
-			///*pStatic->ModifyStyle(0xF,SS_BITMAP|SS_CENTERIMAGE); */ 
-			///*设置静态控件显示位图*/  
-			//pStatic->SetBitmap(hBitmap);
-
-
 			//显示图片
 			int cx, cy;
-			CImage	image;
-			CRect	rect;
+			CImage image;
+			CRect rect;
 			image.Load(picPath);//根据路径载入图片
-			cx	= image.GetWidth();//获取图片的宽 高度
-			cy	= image.GetHeight();
+			cx = image.GetWidth();//获取图片的宽 高度
+			cy = image.GetHeight();
 			GetDlgItem(IDC_LIST_PIC)->GetWindowRect(&rect);//获取Picture Control控件的大小
 			ScreenToClient(&rect);//将客户区选中到控件表示的矩形区域内
 			GetDlgItem(IDC_LIST_PIC)->MoveWindow(rect.left, rect.top, cx, cy, TRUE);//窗口移动到控件表示的区域
 			CWnd *pWnd = NULL;
-			pWnd	= GetDlgItem(IDC_LIST_PIC);//获取控件句柄
+			pWnd = GetDlgItem(IDC_LIST_PIC);//获取控件句柄
 			pWnd->GetClientRect(&rect);//获取句柄指向控件区域的大小
 			CDC *pDc = NULL;
 			pDc	= pWnd->GetDC();//获取picture的DC（画布）
@@ -355,24 +313,6 @@ void CEquipmentLibraryManagerDlg::OnTvnItemexpandingTreeLib(NMHDR *pNMHDR, LRESU
 	*pResult = 0;
 }
 
-void CEquipmentLibraryManagerDlg::OnLvnItemchangedListProp(NMHDR *pNMHDR, LRESULT *pResult)  //器材列表（右）
-{
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	*pResult = 0;
-
-}
-
-void CEquipmentLibraryManagerDlg::OnEnChangeEdit1()
-{
-	// TODO:  如果该控件是 RICHEDIT 控件，它将不
-	// 发送此通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
-
-	// TODO:  在此添加控件通知处理程序代码
-}
-
 void CEquipmentLibraryManagerDlg::OnBnClickedInsertbutton()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -391,6 +331,35 @@ void CEquipmentLibraryManagerDlg::OnBnClickedInsertbutton()
 	}
 	else
 		AfxMessageBox(_T("添加新器材成功"));
+
+	//新建对应输入路径的文件夹
+	CString DocStr;
+	DocStr.Format(_T("%s\\Model\\%s"),m_libPath,m_mPath);
+	CString PropertyDoc;
+	PropertyDoc.Format(_T("%s\\Property"),DocStr);
+	if (!PathIsDirectory(DocStr)&&!PathIsDirectory(DocStr)) 
+	{
+		::CreateDirectory(DocStr, NULL);
+		::CreateDirectory(PropertyDoc, NULL);
+	}
+	else if (PathIsDirectory(DocStr)&&!PathIsDirectory(DocStr))
+	{
+		AfxMessageBox(_T("已有该名字的模型数据文件夹，请重新命名！"));
+	}
+	else 
+		AfxMessageBox(_T("已有该名字的属性文件夹，请重新命名！"));
+	//新建XML文件
+	CString XMLPath;
+	XMLPath.Format(_T("%s"),PropertyDoc);
+	CEquipmentLibraryManagerDlg::CreateXMLFile(XMLPath);
+	//添加预览文件demo.bmp（lq:有待完善）
+	CString SourcePath;
+	CString DestinationPath;
+	SourcePath.Format(_T("%s\\Model\\demo.bmp"),m_libPath);
+	DestinationPath.Format(_T("%s\\demo.bmp"),DocStr);
+	CopyFile(LPCWSTR(SourcePath),LPCWSTR(DestinationPath),TRUE);
+	//添加器材之后进行刷新
+	CEquipmentLibraryManagerDlg::RefreshList();
 }
 
 void CEquipmentLibraryManagerDlg::OnBnClickedRefreshbutton() 
@@ -417,22 +386,170 @@ void CEquipmentLibraryManagerDlg::OnBnClickedRefreshbutton()
 		}
 	else
 			AfxMessageBox(_T("名称更新成功"));
+	//更新器材之后进行刷新
+	CEquipmentLibraryManagerDlg::RefreshList();
 }
 
 void CEquipmentLibraryManagerDlg::OnBnClickedDeletebutton()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	//查询器材名对应的路径
+	CString selsql;
+	selsql.Format(_T("SELECT Path FROM Equipment WHERE (EquipmentName=\"%s\")"),TransEquipmentName);
+	_RecordsetPtr res1 = m_accessMag.GetRecordSet((_bstr_t)selsql);
+	CString Path = (_bstr_t)res1->GetFields()->GetItem("Path")->Value;
+	
+	//删除器材名对应的相关文件
+	CString DeleteDirectory;
+	DeleteDirectory.Format(_T("E:\\课题学习\\2-模块化设计学习动态-李乔\\3-软件开发例程\\6-器材库管理\\Library\\Equipment\\Default\\Model\\%s"),Path);
+	CEquipmentLibraryManagerDlg::DeleteDirectory(DeleteDirectory);
+	RemoveDirectory(DeleteDirectory);
+ 
+	//删除器材名对应的ACCESS数据库数据
 	CString sql;
-	CEquipmentDeleteDialog EquipmentDeleteDialog;
-	EquipmentDeleteDialog.DoModal();
 	sql.Format(_T("DELETE FROM Equipment WHERE EquipmentName = \"%s\"")
-		,m_mEquipmentName);
+		,TransEquipmentName);
 	_RecordsetPtr res = m_accessMag.GetRecordSet((_bstr_t)sql);  //执行ACCESS操作(lq)
 	//判断机制
-	if (m_mEquipmentName.IsEmpty())
+	if (TransEquipmentName.IsEmpty())
 	{
-		AfxMessageBox(_T("请输入想要删除的器材！"));
+		AfxMessageBox(_T("请选择想要删除的器材！"));
 	}
 	else
 	AfxMessageBox(_T("删除器材成功"));
+	//删除器材之后进行刷新
+	CEquipmentLibraryManagerDlg::RefreshList();
 }
+
+
+//删除文件函数
+void CEquipmentLibraryManagerDlg::DeleteDirectory(CString directory_path)   //删除一个文件夹下的所有内容
+{   
+	CFileFind finder;
+	CString path;
+	path.Format(_T("%s\\*.*"),directory_path);
+	BOOL bWorking = finder.FindFile(path);
+	while(bWorking)
+	{
+		bWorking = finder.FindNextFile();
+		if(finder.IsDirectory() && !finder.IsDots())
+		{//处理文件夹
+			DeleteDirectory(finder.GetFilePath()); //递归删除文件夹
+			RemoveDirectory(finder.GetFilePath());
+		}
+		else
+		{//处理文件
+			DeleteFile(finder.GetFilePath());
+		}
+	}
+}
+//在指定路径下创建.xml文件(有待改进)
+void CEquipmentLibraryManagerDlg::CreateXMLFile(CString directory_path)
+{
+	CString pszFileName;
+	pszFileName.Format(_T("%s\\Basic.xml"),directory_path);
+	CStdioFile myFile;
+	CFileException fileException;
+	if(myFile.Open(pszFileName,CFile::typeText|CFile::modeCreate|CFile::modeReadWrite|CFile::modeNoTruncate),&fileException)
+	{
+		CString strOrder;			//如果文件存在则打开，否则创建
+		strOrder.Format(_T("<?xml version=\"1.0\" encoding=\"GBK\" ?> "));
+		myFile.WriteString(strOrder);
+		myFile.WriteString(_T("\r\n"));
+		myFile.WriteString(_T("\r\n"));
+		myFile.WriteString(_T("<Equipment name = \"aa\">"));
+		myFile.WriteString(_T("\r\n"));
+		myFile.WriteString(_T("	<Name Tag=\"Default\" Type=\"Var\" Desc=\"Default\" ValueType=\"string\">Default</Name>"));
+		myFile.WriteString(_T("\r\n"));
+		myFile.WriteString(_T("</Equipment>"));
+		myFile.Close();
+	}
+	else
+	{
+		TRACE("Can't open file %s,error=%u\n",pszFileName,fileException.m_cause);	//异常处理
+	}
+}
+
+void CEquipmentLibraryManagerDlg::RefreshList(void)
+{
+	HTREEITEM node = m_treeCtrlLib.GetSelectedItem();
+	CString sql;
+    //_T()的作用是让你的程序支持Unicode（双字节方式）编码(lq)
+	sql.Format(_T("SELECT * FROM Equipment WHERE NodeID = %d"), m_treeCtrlLib.GetItemData(node));  //SQL语句
+	_RecordsetPtr res = m_accessMag.GetRecordSet((_bstr_t)sql);  //执行查询操作(lq)
+	
+	m_listEquipment.DeleteAllItems();
+	m_listCtrlProp.DeleteAllItems();
+	int i = 0;
+	while(!res->adoEOF)  //adoEOF实际就是EOF（END OF FILE），表示无更多资料可取(lq)
+	{
+		CString name = (_bstr_t)res->GetFields()->GetItem("EquipmentName")->Value;  //取得EquipmentName字段的值(lq)
+		m_listEquipment.InsertItem(i++,name);  //在列表控件里面插入一个新行
+		m_listEquipment.SetItemData(i-1,_ttoi((LPCTSTR)(_bstr_t)res->GetFields()->GetItem("ID")->Value));  //各项的序号和需要的内容相关联（lq）
+		res->MoveNext();  //进入下一条记录
+	}
+	//擦除图片
+	CRect rect;
+	GetDlgItem(IDC_LIST_PIC)->GetWindowRect(&rect);//获取Picture Control控件的大小
+	InvalidateRect(NULL, true);
+}
+void CEquipmentLibraryManagerDlg::OnBnClickedReviseproperty()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString selsql;
+	selsql.Format(_T("SELECT Path FROM Equipment WHERE (EquipmentName=\"%s\")"),TransEquipmentName);
+	_RecordsetPtr res1 = m_accessMag.GetRecordSet((_bstr_t)selsql);
+	CString Path = (_bstr_t)res1->GetFields()->GetItem("Path")->Value;
+	CString XMLPath;
+	XMLPath.Format(_T("%s\\Model\\%s\\Property\\Basic.xml"),m_libPath,Path);
+	ShellExecute(NULL, _T("open"),XMLPath, NULL, NULL, SW_SHOW);
+	CEquipmentLibraryManagerDlg::RefreshList();//如何让更新后效果可视化更明显？
+}
+
+void CEquipmentLibraryManagerDlg::OnBnClickedInsertcatagory()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString sql;
+	sql.Format(_T("INSERT INTO Menu (NodeID, NodeName, ParentID, SortOrder ) values (\"12\",\"8 测试类\",\"0\",\"8\")")
+	/*,m_mEquipmentName, m_mPath, m_mNodeID, m_mSortOrder*/);//需要将NodeID改为手动排序
+	_RecordsetPtr res = m_accessMag.GetRecordSet((_bstr_t)sql);
+	CEquipmentLibraryManagerDlg::ContentFill();
+	AfxMessageBox(_T("插入类别成功！"));
+}
+
+void CEquipmentLibraryManagerDlg::OnBnClickedDeletecatagory()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+void CEquipmentLibraryManagerDlg::ContentFill(void)
+{
+	//将之前所有的内容删除
+	m_treeCtrlLib.DeleteAllItems();
+	m_listEquipment.DeleteAllItems();
+	m_listCtrlProp.DeleteAllItems();
+	//擦除图片
+	CRect rect;
+	GetDlgItem(IDC_LIST_PIC)->GetWindowRect(&rect);//获取Picture Control控件的大小
+	InvalidateRect(NULL, true);
+	m_treeCtrlLib.SetImageList(&m_imageList, TVSIL_NORMAL);// 为树形控件设置图像序列
+    // 初始化数据库连接
+	m_accessMag.OnInitADOConn();
+	// 填充TreeControl控件
+	HTREEITEM root = m_treeCtrlLib.InsertItem(_T("器材库"),2,2,TVI_ROOT,TVI_SORT);	
+	m_treeCtrlLib.SetItemData(root, 0);
+	
+	_RecordsetPtr res = m_accessMag.GetRecordSet("SELECT * FROM Menu WHERE ParentID = 0");	
+	while(!res->adoEOF)
+	{
+		CString name = (_bstr_t)res->GetFields()->GetItem("NodeName")->Value;
+		HTREEITEM node = m_treeCtrlLib.InsertItem(name, root, TVI_SORT);
+		m_treeCtrlLib.SetItemData(node, _ttoi((LPCTSTR)(_bstr_t)res->GetFields()->GetItem("NodeID")->Value));
+		res->MoveNext();
+	}
+	m_treeCtrlLib.Expand(root,TVE_TOGGLE);  //树状结构第一层用程序展开
+	// 填充器材属性控件
+	m_listCtrlProp.InsertColumn(0,_T("属性"),LVCFMT_LEFT,100,0);
+	m_listCtrlProp.InsertColumn(1,_T("值"),LVCFMT_LEFT,200,0);
+}
+

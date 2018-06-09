@@ -2,6 +2,5 @@
 
 <Equipment name = "aa">
 	<Name Tag="Name" Type="Var" Desc="名称" ValueType="string">救援腰带</Name>
-	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">72.3g</Weight>
-	<Weight Tag="Length"  Type="Var"  Desc="长度" ValueType="float">100mm</Weight>
+	<Weight Tag="Weight"  Type="Var"  Desc="重量" ValueType="float">72.3</Weight>
 </Equipment>

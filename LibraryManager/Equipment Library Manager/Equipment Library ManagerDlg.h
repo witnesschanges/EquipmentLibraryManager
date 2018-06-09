@@ -43,9 +43,6 @@ public:
 	afx_msg void OnLvnItemchangedListEquipment(NMHDR *pNMHDR, LRESULT *pResult);
 	CListCtrl m_listCtrlProp;
 	afx_msg void OnTvnItemexpandingTreeLib(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnItemchangedListProp(NMHDR *pNMHDR, LRESULT *pResult);
-
-	afx_msg void OnEnChangeEdit1();
 	afx_msg void OnStnClickedListPic();
 	//插入或删除器材所需传递变量（非控件变量）的声明（lq）
 	CString m_mEquipmentName;  //多出的m代表main（主对话框）
@@ -57,11 +54,24 @@ public:
 	CString m_mOldEquipmentName;
 	CString m_mNewEquipmentName;
 
+
 	//图像列表变量
 	CImageList m_imageList;
+
+	//传递变量
+	//CString 
 
 	//按钮控件
 	afx_msg void OnBnClickedInsertbutton();
 	afx_msg void OnBnClickedRefreshbutton();
 	afx_msg void OnBnClickedDeletebutton();
+	afx_msg void OnBnClickedReviseproperty();
+	afx_msg void OnBnClickedInsertcatagory();
+	afx_msg void OnBnClickedDeletecatagory();
+
+	//自定义函数
+	void DeleteDirectory(CString directory_path);
+	void CreateXMLFile(CString directory_path);
+	void RefreshList(void);
+	void ContentFill(void);
 };
